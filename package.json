@@ -1,0 +1,30 @@
+{
+  "name": "naebujeonsong",
+  "version": "1.0.0",
+  "description": "KTL 내부전송기",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build:win": "electron-builder --win portable",
+    "build:mac": "electron-builder --mac dmg"
+  },
+  "build": {
+    "appId": "work.wqapp.naebujeonsong",
+    "productName": "전송",
+    "files": [
+      "main.js",
+      "내부전송.html"
+    ],
+    "win": {
+      "target": "portable"
+    },
+    "mac": {
+      "target": "dmg",
+      "category": "public.app-category.utilities"
+    }
+  },
+  "devDependencies": {
+    "electron": "^43.4.1",
+    "electron-builder": "^26.15.3"
+  }
+}

@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Ctext y='14' font-size='14'%3E%F0%9F%93%A4%3C/text%3E%3C/svg%3E">
+<title>전송</title>
+<style>
+:root{--bg:#eef1f5;--panel:#fff;--panel2:#f6f8fa;--line:#dde3ea;--line2:#e7ecf1;--fg:#1a2432;--mut:#697585;--acc:#1e6fe0;--acc-fg:#fff;--pend:#b26a00;--pend-bg:#fdf1dd;--sent:#1a7f45;--sent-bg:#e4f4ea;--fail:#c92a2a;--fail-bg:#fce8e8;--send:#1e6fe0;--send-bg:#e4eefb;--mono:ui-monospace,SFMono-Regular,Menlo,monospace}
+@media(prefers-color-scheme:dark){:root{--bg:#0d1117;--panel:#161c24;--panel2:#1b232d;--line:#2a3542;--line2:#232d38;--fg:#e6edf3;--mut:#8b98a8;--acc:#3b8bff;--pend:#e0a13a;--pend-bg:#3a2c14;--sent:#4cc072;--sent-bg:#14301f;--fail:#f2686b;--fail-bg:#361a1c;--send:#3b8bff;--send-bg:#132538}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.5 system-ui,-apple-system,"Segoe UI","Malgun Gothic",sans-serif;-webkit-font-smoothing:antialiased}
+button{font:inherit;cursor:pointer;border:1px solid var(--line);background:var(--panel);color:var(--fg);padding:7px 13px;border-radius:9px;font-weight:560;transition:.12s}
+button:hover{border-color:var(--acc);color:var(--acc)}button:disabled{opacity:.4;cursor:default;color:var(--mut);border-color:var(--line)}
+.pri{background:var(--acc);border-color:var(--acc);color:var(--acc-fg)}.pri:hover{filter:brightness(1.07);color:var(--acc-fg)}
+.sm{padding:5px 11px;font-size:13px;border-radius:8px}.grow{flex:1}
+#login{min-height:100vh;display:grid;place-items:center;padding:20px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:30px 28px;width:100%;max-width:340px;box-shadow:0 8px 30px rgba(0,0,0,.06)}
+.card .dot{width:11px;height:11px;border-radius:50%;background:var(--sent);box-shadow:0 0 0 5px var(--sent-bg);display:inline-block;margin-right:8px}
+.card h1{font-size:18px;font-weight:700;margin:0 0 18px;letter-spacing:-.02em}
+label{display:block;font-size:12px;color:var(--mut);font-weight:600;margin:0 0 5px}
+input{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:9px;background:var(--panel2);color:var(--fg);font:inherit;margin-bottom:14px}
+input:focus{outline:2px solid var(--acc);outline-offset:-1px;border-color:var(--acc)}
+.card button{width:100%;padding:11px;font-weight:650;margin-top:4px}.err-msg{color:var(--fail);font-size:12.5px;margin:2px 0 12px;min-height:16px}
+#app{display:none;max-width:940px;margin:0 auto;padding:0 18px 60px}
+header{position:sticky;top:0;z-index:5;background:var(--bg);padding:18px 0 14px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.dot2{width:9px;height:9px;border-radius:50%;background:var(--sent);box-shadow:0 0 0 4px var(--sent-bg)}
+h2{font-size:16px;font-weight:680;margin:0;letter-spacing:-.02em}.who{color:var(--mut);font-size:12.5px}.who b{color:var(--fg)}
+.counts{display:flex;gap:7px;font-size:12px}.chip{padding:3px 9px;border-radius:20px;font-weight:650;font-variant-numeric:tabular-nums}
+.chip.p{color:var(--pend);background:var(--pend-bg)}.chip.f{color:var(--fail);background:var(--fail-bg)}.chip.s{color:var(--sent);background:var(--sent-bg)}
+main{padding-top:18px}
+.group{background:var(--panel);border:1px solid var(--line);border-radius:14px;margin-bottom:14px;overflow:hidden}
+.ghead{display:flex;align-items:center;gap:12px;padding:13px 16px;background:var(--panel2);border-bottom:1px solid var(--line2);flex-wrap:wrap}
+.rc{font-family:var(--mono);font-size:15px;font-weight:680}.site{color:var(--fg);font-size:13px;font-weight:640}.gcount{color:var(--mut);font-size:12.5px}
+.items{display:flex;flex-direction:column}.item{display:flex;align-items:center;gap:12px;padding:11px 16px;border-bottom:1px solid var(--line2)}
+.item:last-child{border-bottom:0}.item.done{opacity:.72}
+.igubn{font-family:var(--mono);font-size:13px;font-weight:600;min-width:150px}.ifiles{color:var(--mut);font-size:12.5px;min-width:52px}
+.dtime{color:var(--mut);font-size:11.5px;font-family:var(--mono)}.keep{color:var(--mut);font-size:11px;background:var(--panel2);border:1px solid var(--line2);padding:1px 7px;border-radius:20px}
+.pill{padding:2.5px 10px;border-radius:20px;font-size:12px;font-weight:660;min-width:56px;text-align:center}
+.st-pending{color:var(--pend);background:var(--pend-bg)}.st-failed{color:var(--fail);background:var(--fail-bg)}.st-sending{color:var(--send);background:var(--send-bg)}.st-sent{color:var(--sent);background:var(--sent-bg)}
+.err{color:var(--fail);font-size:12px;cursor:help}
+.log{margin-top:22px;background:var(--panel);border:1px solid var(--line);border-radius:14px}
+.log h3{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--mut);margin:0;padding:12px 16px;border-bottom:1px solid var(--line2);font-weight:660}
+#log{font-family:var(--mono);font-size:12px;line-height:1.7;color:var(--mut);padding:12px 16px;max-height:200px;overflow:auto;white-space:pre-wrap;margin:0}
+.empty{padding:56px 20px;text-align:center;color:var(--mut)}.note{font-size:11.5px;color:var(--mut);margin-top:14px;text-align:center;line-height:1.6}
+</style>
+</head>
+<body>
+<div id="login"><div class="card"><div><span class="dot"></span></div>
+<h1>전송</h1>
+<label>아이디</label><input id="u" placeholder="아이디" autocomplete="username">
+<label>비밀번호</label><input id="p" type="password" placeholder="비밀번호" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
+<div class="err-msg" id="lerr"></div><button class="pri" onclick="doLogin()">로그인</button></div></div>
+
+<div id="app"><header><span class="dot2"></span>
+<div><h2>전송 대기열</h2><div class="who"><b id="me"></b> 님 · 본인 저장건</div></div><div class="grow"></div>
+<div class="counts" id="counts"></div><button class="sm" onclick="load()">새로고침</button>
+<button class="sm pri" id="allbtn" onclick="sendAll()">전체 전송</button><button class="sm" onclick="logout()">로그아웃</button></header>
+<main id="list"></main><div class="log"><h3>전송 로그</h3><pre id="log">대기 중…</pre></div>
+<div class="note">이 화면(브라우저)이 KTL로 직접 전송합니다. 전송 완료 시 파일은 삭제되고, 완료 기록은 10일간 보관됩니다.</div></div>
+
+<script>
+// ── 설정 ──────────────────────────────────────────────
+var SB = 'https://zsechnvjciwxgexgaegq.supabase.co';
+var SK = 'sb_publishable_30AET3czl_3lwffH45TdDA_KxBrpFvv';
+var SBH = { apikey: SK, Authorization: 'Bearer ' + SK, 'Content-Type': 'application/json' };
+var KTL = 'https://mobile.ktl.re.kr/labview/api';
+var BUCKET = 'ktl-files';   // Supabase Storage 버킷 (파일 실체는 여기, DB엔 경로만)
+var KEEP_DAYS = 10;
+var ADMIN_ROLES = ['관리자','admin','슈퍼','super'];
+var me = null, iAmAdmin = false, DATA = [];
+
+var $ = function(s){ return document.querySelector(s); };
+function esc(s){ return String(s==null?'':s).replace(/[<>&"]/g, function(c){return {'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c];}); }
+function logln(m){ var b=$('#log'); var t=new Date().toLocaleTimeString('ko-KR'); b.textContent=t+'  '+m+'\n'+(b.textContent==='대기 중…'?'':b.textContent); }
+function fmtSent(ms){ if(!ms) return ''; var d=new Date(Number(ms)); var p=function(n){return String(n).padStart(2,'0');}; return p(d.getMonth()+1)+'-'+p(d.getDate())+' '+p(d.getHours())+':'+p(d.getMinutes()); }
+var enc = encodeURIComponent;
+
+async function sbGet(path){ var r = await fetch(SB+'/rest/v1/'+path, {headers:SBH}); return r.json(); }
+
+// ── 로그인 (app_users 대조) ────────────────────────────
+async function doLogin(){
+  var u = $('#u').value.trim(), p = $('#p').value.trim();
+  if(!u||!p){ $('#lerr').textContent='아이디와 비밀번호를 입력하세요.'; return; }
+  $('#lerr').textContent='확인 중…';
+  try{
+    var rows = await sbGet('app_users?user_name=eq.'+enc(u)+'&password=eq.'+enc(p)+'&select=user_name,role');
+    if(rows && rows.length){
+      me = rows[0].user_name;
+      iAmAdmin = ADMIN_ROLES.indexOf(String(rows[0].role||'').trim()) >= 0;
+      $('#lerr').textContent='';
+      $('#login').style.display='none'; $('#app').style.display='block';
+      $('#me').textContent = me + (iAmAdmin?' (관리자·전체)':'');
+      load();
+    } else { $('#lerr').textContent='아이디 또는 비밀번호가 일치하지 않습니다.'; }
+  }catch(e){ $('#lerr').textContent='연결 오류: '+e.message; }
+}
+function logout(){ me=null; DATA=[]; $('#app').style.display='none'; $('#login').style.display='grid'; $('#p').value=''; }
+
+// ── 10일 지난 완료 정리 ────────────────────────────────
+async function cleanupSent(){
+  try{
+    var cutoff = Date.now() - KEEP_DAYS*24*60*60*1000;
+    await fetch(SB+'/rest/v1/ktl_queue?status=eq.sent&sent_at=lt.'+cutoff, {method:'DELETE', headers:Object.assign({}, SBH, {Prefer:'return=minimal'})});
+  }catch(e){}
+}
+
+async function load(){
+  try{
+    await cleanupSent();
+    var flt = iAmAdmin ? '' : '&user_name=eq.'+enc(me);
+    var rows = await sbGet('ktl_queue?select=id,receipt_no,item,user_name,status,error,sent_at,payload'+flt+'&order=receipt_no.asc,item.asc');
+    rows = Array.isArray(rows) ? rows : [];
+    DATA = await Promise.all(rows.map(async function(q){
+      var files = 0;
+      if(q.status !== 'sent'){
+        var f = await sbGet('ktl_queue_files?queue_id=eq.'+q.id+'&select=name');
+        // 조각 저장이라 행수 아닌 고유 파일명 개수로 카운트
+        files = Array.isArray(f) ? (function(){ var s={}; f.forEach(function(x){s[x.name]=1;}); return Object.keys(s).length; })() : 0;
+      }
+      // payload에서 현장명·항목(GUBN) 추출 (item 칸 비어도 여기서 채움)
+      var site = '', gubn = '';
+      try {
+        var pj = (q.payload && q.payload.json) || {};
+        gubn = pj.LABVIEW_GUBN || '';
+        var it = JSON.parse(pj.LABVIEW_ITEM || '{}');
+        site = it['현장'] || it['현장명'] || '';
+      } catch(e){}
+      return Object.assign({}, q, {files:files, site:site, gubn:gubn});
+    }));
+    render();
+  }catch(e){ logln('큐 조회 오류: '+e.message); }
+}
+
+function counts(){
+  var c={pending:0,failed:0,sent:0}; DATA.forEach(function(q){ if(c[q.status]!==undefined) c[q.status]++; });
+  $('#counts').innerHTML='<span class="chip p">대기 '+c.pending+'</span>'+(c.failed?'<span class="chip f">실패 '+c.failed+'</span>':'')+(c.sent?'<span class="chip s">완료 '+c.sent+'</span>':'');
+  $('#allbtn').disabled = !(c.pending+c.failed);
+}
+function render(){
+  counts();
+  if(!DATA.length){ $('#list').innerHTML='<div class="empty">전송할 대기건이 없습니다 ✓</div>'; return; }
+  var groups={}; DATA.forEach(function(q){ (groups[q.receipt_no]=groups[q.receipt_no]||[]).push(q); });
+  $('#list').innerHTML = Object.keys(groups).map(function(rc){
+    var g=groups[rc]; var pend=g.filter(function(x){return x.status==='pending'||x.status==='failed';});
+    var site=''; for(var s=0;s<g.length;s++){ if(g[s].site){ site=g[s].site; break; } }
+    return '<section class="group"><div class="ghead"><span class="rc">'+esc(rc)+'</span>'+(site?'<span class="site">🏭 '+esc(site)+'</span>':'')+'<span class="gcount">'+g.length+'개 항목</span><div class="grow"></div>'+
+      (pend.length?'<button class="sm pri" onclick="sendReceipt(\''+esc(rc)+'\')">이 접수번호 전송 ('+pend.length+')</button>':'')+
+      '</div><div class="items">'+g.map(function(q){
+        var can=q.status==='pending'||q.status==='failed'; var done=q.status==='sent';
+        return '<div class="item'+(done?' done':'')+'" id="it'+q.id+'"><span class="igubn">'+esc(q.item||q.gubn||'-')+'</span>'+
+          (done?'<span class="dtime">'+fmtSent(q.sent_at)+' 전송됨</span>':'<span class="ifiles">📎 '+(q.files||0)+'</span>')+
+          '<span class="pill st-'+(done?'sent':q.status)+'">'+(done?'완료':q.status)+'</span>'+
+          (q.error?'<span class="err" title="'+esc(q.error)+'">⚠</span>':'')+'<div class="grow"></div>'+
+          (done?'<span class="keep">10일 보관</span>':(can?'<button class="sm" onclick="send('+q.id+')">전송</button>':''))+'</div>';
+      }).join('')+'</div></section>';
+  }).join('');
+}
+
+// ── base64 → Blob ──────────────────────────────────────
+function b64ToBlob(b64, mime){
+  var bin = atob(b64||''); var bytes = new Uint8Array(bin.length);
+  for(var i=0;i<bin.length;i++) bytes[i]=bin.charCodeAt(i);
+  return new Blob([bytes], {type: mime||'application/octet-stream'});
+}
+
+// ── 실제 KTL 전송 (브라우저 → KTL 직접, 수분석과 동일) ──
+async function send(id){
+  var q = DATA.filter(function(x){return x.id===id;})[0];
+  if(q && (q.status==='sending'||q.status==='sent')) return;
+  if(q){ q.status='sending'; render(); }
+  logln('▶ #'+id+' '+(q?q.receipt_no:'')+' '+(q?q.item:'')+' 전송…');
+  try{
+    var row = (await sbGet('ktl_queue?id=eq.'+id+'&select=*&limit=1'))[0];
+    if(!row) throw new Error('큐 없음');
+    var payload = row.payload || {};
+    var upEP = payload.uploadEndpoint || '/uploadfiles';
+    var jsonEP = payload.jsonEndpoint || '/env';
+    // 1) 파일 업로드 (3개씩 배치, multipart — Content-Type은 브라우저가 boundary 포함해 자동설정)
+    var rows = await sbGet('ktl_queue_files?queue_id=eq.'+id+'&order=ord.asc&select=name,mime,data,ord');
+    rows = Array.isArray(rows) ? rows : [];
+    // 각 파일을 Supabase Storage에서 다운로드 (data = 경로)
+    var files = [];
+    for (var fi=0; fi<rows.length; fi++) {
+      var resp = await fetch(SB+'/storage/v1/object/'+BUCKET+'/'+rows[fi].data, {headers:{apikey:SK, Authorization:'Bearer '+SK}});
+      if(!resp.ok) throw new Error('파일 다운로드 실패('+rows[fi].name+') '+resp.status);
+      files.push({name:rows[fi].name, blob: await resp.blob()});
+    }
+    for(var i=0;i<files.length;i+=3){
+      var fd = new FormData();
+      files.slice(i,i+3).forEach(function(f){ fd.append('files', f.blob, f.name); });
+      var up = await fetch(KTL+upEP, {method:'POST', body:fd});
+      if(!up.ok) throw new Error('파일업로드 실패 '+up.status+': '+(await up.text()).slice(0,120));
+    }
+    if(files.length) logln('  · 파일 '+files.length+'개 업로드 OK');
+    // 2) JSON 전송 (/env)
+    var jr = await fetch(KTL+jsonEP, {method:'POST', headers:{'Content-Type':'application/json','Accept':'application/json'}, body: JSON.stringify(payload.json!=null?payload.json:payload)});
+    if(!jr.ok) throw new Error('JSON전송 실패 '+jr.status+': '+(await jr.text()).slice(0,120));
+    // 3) 완료: sent 표시 + 파일 삭제(용량절약)
+    await fetch(SB+'/rest/v1/ktl_queue?id=eq.'+id, {method:'PATCH', headers:Object.assign({}, SBH, {Prefer:'return=minimal'}), body: JSON.stringify({status:'sent', sent_at:Date.now(), error:''})});
+    // Storage 파일 삭제(용량 회수) + DB 파일행 삭제
+    for (var di=0; di<rows.length; di++) {
+      try { await fetch(SB+'/storage/v1/object/'+BUCKET+'/'+rows[di].data, {method:'DELETE', headers:{apikey:SK, Authorization:'Bearer '+SK}}); } catch(e){}
+    }
+    await fetch(SB+'/rest/v1/ktl_queue_files?queue_id=eq.'+id, {method:'DELETE', headers:Object.assign({}, SBH, {Prefer:'return=minimal'})});
+    logln('✅ #'+id+' 전송 완료 → 파일삭제, 완료기록 10일 보관');
+  }catch(e){
+    logln('❌ #'+id+' 실패: '+e.message);
+    try{ await fetch(SB+'/rest/v1/ktl_queue?id=eq.'+id, {method:'PATCH', headers:Object.assign({}, SBH, {Prefer:'return=minimal'}), body: JSON.stringify({status:'failed', error:String(e.message).slice(0,400)})}); }catch(_){}
+  }
+  await load();
+}
+async function sendReceipt(rc){ logln('▶ 접수번호 '+rc+' 전체 전송'); var ids=DATA.filter(function(x){return x.receipt_no===rc&&(x.status==='pending'||x.status==='failed');}).map(function(x){return x.id;}); for(var i=0;i<ids.length;i++){ await send(ids[i]); } }
+async function sendAll(){ logln('▶ 전체 전송'); var ids=DATA.filter(function(x){return x.status==='pending'||x.status==='failed';}).map(function(x){return x.id;}); for(var i=0;i<ids.length;i++){ await send(ids[i]); } }
+</script>
+</body>
+</html>
